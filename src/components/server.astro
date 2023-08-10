@@ -1,0 +1,33 @@
+---
+import ServersState from "../apis";
+const respuesta = await ServersState();
+---
+
+<ul
+  class="flex flex-col w-full items-center gap-2 pt-10"
+  id="lista_server">
+  {
+    respuesta &&
+      respuesta.map(({ url, titulo, estado }) => (
+        <li class="w-[80%] border border-black rounded-md">
+          <a
+            href={url}
+            title={titulo}
+            class="flex justify-center items-center">
+            <div class="w-[80%] flex px-3 py-2">
+              <h4>{titulo}</h4>
+            </div>
+            <div class="w-[20%] flex justify-center items-center px-3 py-2">
+              <span
+                class={`
+                ${
+                  estado ? "bg-green-600" : "bg-red-600"
+                } h-[40px] w-[40px] rounded-full
+                `}
+              />
+            </div>
+          </a>
+        </li>
+      ))
+  }
+</ul>
