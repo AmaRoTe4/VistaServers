@@ -1,5 +1,6 @@
 ---
 import ServersState from "../apis";
+import { formateoText } from "../funciones/formateos.js";
 const respuesta = await ServersState();
 ---
 
@@ -8,26 +9,88 @@ const respuesta = await ServersState();
   id="lista_server">
   {
     respuesta &&
-      respuesta.map(({ url, titulo, estado }) => (
-        <li class="w-[80%] border border-black rounded-md">
-          <a
-            href={url}
-            title={titulo}
-            class="flex justify-center items-center">
-            <div class="w-[80%] flex px-3 py-2">
-              <h4>{titulo}</h4>
+      respuesta.map(({ url, titulo, estado , tipos }) => (
+        <li id={formateoText(titulo)} class="w-[80%] flex flex-col gap-2 rounded-md">
+          <div class="w-full h-auto flex">
+            <div class="w-[10%] flex justify-center items-center">
+              <button class="border border-black rounded-full p-2">
+                <img
+                  src="/public/cloud.svg"
+                  class="h-[25px] w-[25px]"
+                  alt="nube"
+                />
+              </button>
             </div>
-            <div class="w-[20%] flex justify-center items-center px-3 py-2">
-              <span
-                class={`
-                ${
-                  estado ? "bg-green-600" : "bg-red-600"
-                } h-[40px] w-[40px] rounded-full
-                `}
-              />
+            <a
+              href={url}
+              title={titulo}
+              class="flex justify-center items-center w-[80%] border border-black rounded-md">
+              <div class="w-[80%] flex px-3 py-2">
+                <h4>{titulo}</h4>
+              </div>
+              <div class="w-[20%] flex justify-end items-center px-3 py-2">
+                <span
+                  class={`
+                  ${
+                    estado ? "bg-green-600" : "bg-red-600"
+                  } h-[40px] w-[40px] rounded-full
+                  `}
+                />
+              </div>
+            </a>
+            <div class="w-[10%] flex justify-center items-center">
+              <button type="button" class="p-2" id={`btn-${formateoText(titulo)}`}>
+                <img
+                  src="/public/arrow_down.svg"
+                  class="h-[25px] w-[25px]"
+                  alt="nube"
+                />
+              </button>
             </div>
-          </a>
+          </div>
+          <div class="hidden w-full h-auto border-b border-black" id={`lista-${formateoText(titulo)}`}>
+            <ul class="flex items-center justify-center">
+              {tipos.map(m => 
+                <li class="flex items-center justify-center">
+                  <button class="p-2">
+                    <img
+                    src="/public/cloudDonwload.svg"
+                    class="h-[25px] w-[25px]"
+                      alt="nube"
+                    />
+                  </button>
+                  <p class="h-full items-center justify-center">{m}</p>
+                </li>
+              )}
+            </ul>
+          </div>
         </li>
       ))
-  }
+    }
 </ul>
+
+<script>
+  const lista_server = document.getElementById("lista_server")
+  const titulos = [...lista_server.children].map(n => n.id)
+  let listas = [] 
+  let btn = [] 
+  
+  titulos.map(n => {
+    listas.push(document.getElementById("lista-" + n))
+    btn.push(document.getElementById("btn-" + n))
+  })
+
+  btn.forEach((n , i) => {
+    n.addEventListener("click" , () => {
+      if(listas[i].classList.contains("hidden")) {
+        listas[i].classList.remove("hidden")
+        listas[i].classList.add("flex")
+      }
+      else if(listas[i].classList.contains("flex")){
+        listas[i].classList.remove("flex")
+        listas[i].classList.add("hidden")
+      } 
+    })
+  })
+
+</script>

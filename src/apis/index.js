@@ -5,21 +5,23 @@ const data = [
     titulo: "SDN Usuarios",
     url: SDN_USUARIOS,
     estado: false,
+    tipos: []
   },
   {
     titulo: "Locales Comerciales",
     url: LOCALES_COMERCIALES,
     estado: false,
+    tipos: []
   },
   {
     titulo: "UTN",
     url: UTN,
     estado: false,
+    tipos: []
   },
 ];
 
 const fetchGet = async (path) => {
-  console.log(path);
   return await fetch(path)
     .then((data) => {
       return data.ok;
@@ -35,6 +37,7 @@ export default async function ServersState() {
       titulo: data[i].titulo,
       url: data[i].url,
       estado: respuesta,
+      tipos: data[i].tipos
     });
   }
   return retorno;
