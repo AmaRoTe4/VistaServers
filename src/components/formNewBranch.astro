@@ -1,0 +1,62 @@
+---
+const { parent } = Astro.props
+---
+
+
+<div
+  id="form-add-branch"
+  class="hidden absolute top-0 left-0 h-screen w-screen flex-col items-center"
+  style="background-color: rgba(0, 0, 0, .8);">
+  <button
+    id="btn-form-branch-vista-close"
+    class="absolute top-2 right-2">
+    <img
+      src="/xmark.svg"
+      class="h-[30px] w-[30px]"
+      alt="xmark"
+    />
+  </button>
+  <form
+    id="form-new-rama"
+    class="bg-black gap-2 pt-2 py-4 flex flex-col items-center border border-white w-[90%] mt-[15vh]">
+    <h2 class="py-2 px-3 text-white text-[24px] text-center">
+      Agregar una nueva rama
+    </h2>
+    <div class="flex flex-col gap-3">
+      <input
+        class="px-3 py-2 text-black text-[20px]"
+        type="text"
+        placeholder="name"
+        id="name"
+        name="name"
+      />
+      <button
+        type="submit"
+        class="bg-green-500 px-2 py-3 text-black min-w-[80%]">
+        Create
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+  import { addBranch, createData } from "../apis/firebase.js";
+
+  const form = document.getElementById("form-new-rama") as HTMLFormElement;
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formInfo = e.target as HTMLFormElement;
+    const formData = new FormData(formInfo);
+
+    const name = formData.get("name") as string;
+
+    const newConexion = {
+      name,
+    };
+
+    await addBranch(newConexion);
+    form.reset()
+    alert("Rama creada")
+  });
+</script>

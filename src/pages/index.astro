@@ -1,13 +1,12 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Server from "../components/server.astro";
+import NavBar from "../components/navBar.astro";
 ---
 
 <Layout>
   <main class="w-screem">
-    <div class="w-full flex flex-col items-center p-5">
-      <h1 class="text-[30px] font-bold">Server estados</h1>
-    </div>
+    <NavBar />
     <div class="w-full flex flex-col items-center">
       <Server />
     </div>

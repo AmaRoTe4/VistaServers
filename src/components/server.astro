@@ -1,96 +1,169 @@
 ---
 import ServersState from "../apis";
 import { formateoText } from "../funciones/formateos.js";
+import FormNewBranch from "./formNewBranch.astro";
 const respuesta = await ServersState();
 ---
 
+<FormNewBranch />
 <ul
   class="flex flex-col w-full items-center gap-2 pt-10"
   id="lista_server">
   {
     respuesta &&
-      respuesta.map(({ url, titulo, estado , tipos }) => (
-        <li id={formateoText(titulo)} class="w-[80%] flex flex-col gap-2 rounded-md">
-          <div class="w-full h-auto flex">
-            <div class="w-[10%] flex justify-center items-center">
-              <button class="border border-black rounded-full p-2">
-                <img
-                  src="/public/cloud.svg"
-                  class="h-[25px] w-[25px]"
-                  alt="nube"
-                />
-              </button>
-            </div>
-            <a
-              href={url}
-              title={titulo}
-              class="flex justify-center items-center w-[80%] border border-black rounded-md">
-              <div class="w-[80%] flex px-3 py-2">
-                <h4>{titulo}</h4>
-              </div>
-              <div class="w-[20%] flex justify-end items-center px-3 py-2">
-                <span
-                  class={`
-                  ${
-                    estado ? "bg-green-600" : "bg-red-600"
-                  } h-[40px] w-[40px] rounded-full
-                  `}
-                />
-              </div>
-            </a>
-            <div class="w-[10%] flex justify-center items-center">
-              <button type="button" class="p-2" id={`btn-${formateoText(titulo)}`}>
-                <img
-                  src="/public/arrow_down.svg"
-                  class="h-[25px] w-[25px]"
-                  alt="nube"
-                />
-              </button>
-            </div>
-          </div>
-          <div class="hidden w-full h-auto border-b border-black" id={`lista-${formateoText(titulo)}`}>
-            <ul class="flex items-center justify-center">
-              {tipos.map(m => 
-                <li class="flex items-center justify-center">
-                  <button class="p-2">
-                    <img
-                    src="/public/cloudDonwload.svg"
+      respuesta.map(({ _id, url, titulo, estado, tipos }) => {
+        return (
+          <li
+            id={_id}
+            class="w-[95%] md:w-[80%] flex flex-col items-center gap-5 md:gap-2 rounded-md">
+            <div class="w-full h-auto flex justify-between gap-5 md:gap-0">
+              <div class="w-[50px] md:w-[10%] flex justify-center items-center">
+                <button class="border border-black rounded-full p-2">
+                  <img
+                    src="/cloud.svg"
                     class="h-[25px] w-[25px]"
+                    alt="nube"
+                  />
+                </button>
+              </div>
+              <a
+                href={url}
+                title={titulo}
+                target="_blank"
+                class="flex justify-center items-center w-full min-w-[225px] md:w-[80%] border border-black rounded-md">
+                <div class="w-full md:w-[80%] flex px-3 py-2">
+                  <h4>{titulo}</h4>
+                </div>
+                <div class="w-[70px] md:w-[20%] flex justify-end items-center px-3 py-2">
+                  <span
+                    class={`
+                    ${
+                      estado ? "bg-green-600" : "bg-red-600"
+                    } h-[40px] w-[40px] rounded-full
+                    `}
+                  />
+                </div>
+              </a>
+              <div class="w-[50px] md:w-[10%] flex justify-center items-center">
+                <button
+                  type="button"
+                  class="p-2"
+                  id={`btn-desplegable-${_id}`}>
+                  <img
+                    src="/arrow_down.svg"
+                    class="h-[25px] w-[25px]"
+                    alt="nube"
+                  />
+                </button>
+              </div>
+            </div>
+            <div
+              class="hidden w-full h-auto border-b border-black"
+              id={`lista-de-tipos-${_id}`}>
+              <ul class="w-full flex flex-col items-center justify-center">
+                <li class="w-full flex items-center justify-end">
+                  <button
+                    type="button"
+                    id="btn-form-branch-vista-open"
+                    class="p-2">
+                    <img
+                      src="/plus.svg"
+                      class="h-[25px] w-[25px]"
                       alt="nube"
                     />
                   </button>
-                  <p class="h-full items-center justify-center">{m}</p>
                 </li>
-              )}
-            </ul>
-          </div>
-        </li>
-      ))
-    }
+                {tipos.length > 0 &&
+                  tipos.map((m) => {
+                    return (
+                      <li
+                        id={m}
+                        class={`w-full flex items-center justify-between tipos-server-${_id}`}>
+                        <button
+                          class="p-2"
+                          id={`btn-back-up-${m}`}>
+                          <img
+                            src="/cloudDonwload.svg"
+                            class="h-[25px] w-[25px]"
+                            alt="nube"
+                          />
+                        </button>
+                        <p class="h-full items-center justify-center">{m}</p>
+                        <button
+                          id={`btn-remove-${m}`}
+                          class="p-2">
+                          <img
+                            src="/xmark_black.svg"
+                            class="h-[25px] w-[25px] fill-black"
+                            alt="delete"
+                          />
+                        </button>
+                      </li>
+                    );
+                  })}
+              </ul>
+            </div>
+          </li>
+        );
+      })
+  }
 </ul>
 
-<script>
-  const lista_server = document.getElementById("lista_server")
-  const titulos = [...lista_server.children].map(n => n.id)
-  let listas = [] 
-  let btn = [] 
-  
-  titulos.map(n => {
-    listas.push(document.getElementById("lista-" + n))
-    btn.push(document.getElementById("btn-" + n))
-  })
+<script>import { removeBranch } from "../apis/firebase";
 
-  btn.forEach((n , i) => {
-    n.addEventListener("click" , () => {
-      if(listas[i].classList.contains("hidden")) {
-        listas[i].classList.remove("hidden")
-        listas[i].classList.add("flex")
-      }
-      else if(listas[i].classList.contains("flex")){
-        listas[i].classList.remove("flex")
-        listas[i].classList.add("hidden")
-      } 
+  const btn_close = document.getElementById("btn-form-branch-vista-close");
+  const btn_open = document.getElementById("btn-form-branch-vista-open");
+  const form_add_branch = document.getElementById("form-add-branch");
+
+  const lista_server = document.getElementById("lista_server");
+  const ids = [...lista_server.children].map((n) => n.id);
+
+  let listas = [];
+  let tipos = [];
+  let btn_desplegable = [];
+  let btn_remove = [];
+
+  ids.map((n) => {
+    listas.push(document.getElementById("lista-de-tipos-" + n))  
+    const aux = document.querySelectorAll(".tipos-server-" + n)
+    
+    aux.forEach(m => {
+      tipos.push({elemet:m , id: n})
     })
-  })
 
+    btn_desplegable.push(document.getElementById("btn-desplegable-" + n));
+    btn_remove.push(document.getElementById("btn-remove-" + n));
+  });
+
+  tipos.forEach((n, i) => {
+    n.elemet.children[2].addEventListener("click", async (e) => {
+      await removeBranch(n.elemet , n.id)
+      //remove
+    });
+    n.elemet.children[0].addEventListener("click", (e) => {
+      //nube
+    });
+  });
+
+  btn_desplegable.forEach((n, i) => {
+    n.addEventListener("click", () => {
+      if (listas[i].classList.contains("hidden")) {
+        listas[i].classList.remove("hidden");
+        listas[i].classList.add("flex");
+      } else if (listas[i].classList.contains("flex")) {
+        listas[i].classList.remove("flex");
+        listas[i].classList.add("hidden");
+      }
+    });
+  });
+
+  btn_open.addEventListener("click", () => {
+    form_add_branch.classList.remove("hidden");
+    form_add_branch.classList.add("flex");
+  });
+
+  btn_close.addEventListener("click", () => {
+    form_add_branch.classList.remove("flex");
+    form_add_branch.classList.add("hidden");
+  });
 </script>

@@ -1,0 +1,78 @@
+<div
+  id="form-add-connection"
+  class="hidden absolute top-0 left-0 h-screen w-screen flex-col items-center"
+  style="background-color: rgba(0, 0, 0, .8);">
+  <button
+    id="btn-form-vista-close"
+    class="absolute top-2 right-2">
+    <img
+      src="/xmark.svg"
+      class="h-[30px] w-[30px]"
+      alt="xmark"
+    />
+  </button>
+  <form
+    id="form-new-conexion"
+    class="bg-black gap-2 pt-2 py-4 flex flex-col items-center border border-white w-[90%] mt-[15vh]">
+    <h2 class="py-2 px-3 text-white text-[24px] text-center">
+      Agregar nuevo conexion de control
+    </h2>
+    <div class="flex flex-col gap-3">
+      <input
+        class="px-3 py-2 text-black text-[20px]"
+        type="text"
+        placeholder="titulo"
+        id="titulo"
+        name="titulo"
+      />
+      <input
+        class="px-3 py-2 text-black text-[20px]"
+        type="text"
+        placeholder="url"
+        id="url"
+        name="url"
+      />
+      <textarea
+        id="tipos"
+        name="tipos"
+        class="px-3 py-2 text-black text-[20px]"
+        placeholder="tipos"
+      ></textarea>
+      <button
+        type="submit"
+        class="bg-green-500 px-2 py-3 text-black min-w-[80%]">
+        Create
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+  import { createData } from "../apis/firebase.js";
+
+  const form = document.getElementById("form-new-conexion") as HTMLFormElement;
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formInfo = e.target as HTMLFormElement;
+    const formData = new FormData(formInfo);
+
+    const titulo = formData.get("titulo") as string;
+    const url = formData.get("url") as string;
+    let tipos_string = formData.get("tipos") as string;
+    const tipos = tipos_string
+      .split("\n")
+      .map((n) => n.trim().toLocaleLowerCase());
+
+    const newConexion = {
+      titulo,
+      url,
+      tipos,
+      estado: false,
+    };
+
+    await createData(newConexion);
+    form.reset()
+    alert("Creado")
+  });
+</script>

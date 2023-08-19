@@ -1,0 +1,49 @@
+---
+import FormNewConnection from "./formNewConnection.astro";
+---
+
+<FormNewConnection />
+<nav class="w-full flex justify-between items-center p-5 border-b border-black">
+  <div>
+    <h1 class="text-[30px] font-bold">Server estados</h1>
+  </div>
+  <div>
+    <button id="btn-form-vista-open">
+      <img
+        src="/plus.svg"
+        class="h-[30px] w-[30px]"
+        alt="plus"
+      />
+    </button>
+  </div>
+</nav>
+
+<script>
+  const btn_open = document.getElementById("btn-form-vista-open");
+  const btn_close = document.getElementById("btn-form-vista-close");
+  const titulo = document.getElementById("titulo");
+  const form_add_connection = document.getElementById("form-add-connection");
+
+  const openForm = () => {
+    form_add_connection.classList.remove("hidden");
+    form_add_connection.classList.add("flex");
+  };
+
+  const closeForm = () => {
+    form_add_connection.classList.remove("flex");
+    form_add_connection.classList.add("hidden");
+  };
+
+  btn_open.addEventListener("click", () => openForm());
+  btn_close.addEventListener("click", () => closeForm());
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "+") {
+      openForm();
+      titulo.focus();
+    }
+    if (e.key === "Escape") {
+      closeForm();
+    }
+  });
+</script>
