@@ -1,13 +1,13 @@
 ---
 import ServersState from "../apis";
-import { formateoText } from "../funciones/formateos.js";
+import Funciones from "../components/funciones.astro";
 import FormNewBranch from "./formNewBranch.astro";
 const respuesta = await ServersState();
 ---
 
 <FormNewBranch />
 <ul
-  class="flex flex-col w-full items-center gap-2 pt-10"
+  class="flex flex-col w-full items-center gap-2 py-10"
   id="lista_server">
   {
     respuesta &&
@@ -17,8 +17,11 @@ const respuesta = await ServersState();
             id={_id}
             class="w-[95%] md:w-[80%] flex flex-col items-center gap-5 md:gap-2 rounded-md">
             <div class="w-full h-auto flex justify-between gap-5 md:gap-0">
-              <div class="w-[50px] md:w-[10%] flex justify-center items-center">
-                <button class="border border-black rounded-full p-2">
+              <div class="hidden w-[50px] md:w-[10%] md:flex justify-center items-center">
+                <button
+                  class={`${
+                    "cloud-memori-" + _id
+                  } border border-black rounded-full p-2`}>
                   <img
                     src="/cloud.svg"
                     class="h-[25px] w-[25px]"
@@ -26,16 +29,20 @@ const respuesta = await ServersState();
                   />
                 </button>
               </div>
-              <a
-                href={url}
-                title={titulo}
-                target="_blank"
-                class="flex justify-center items-center w-full min-w-[225px] md:w-[80%] border border-black rounded-md">
+              <span
+                data-id={_id}
+                id={`vista-server-${_id}`}
+                class="flex justify-center items-center w-full min-w-[225px] md:w-[70%] border border-black rounded-md">
                 <div class="w-full md:w-[80%] flex px-3 py-2">
-                  <h4>{titulo}</h4>
+                  <h3>
+                    {titulo}
+                  </h3>
                 </div>
                 <div class="w-[70px] md:w-[20%] flex justify-end items-center px-3 py-2">
-                  <span
+                  <a
+                    href={url}
+                    title={titulo}
+                    target="_blank"
                     class={`
                     ${
                       estado ? "bg-green-600" : "bg-red-600"
@@ -43,12 +50,23 @@ const respuesta = await ServersState();
                     `}
                   />
                 </div>
-              </a>
-              <div class="w-[50px] md:w-[10%] flex justify-center items-center">
+              </span>
+              <div class="hidden w-[50px] md:w-[10%] md:flex justify-center items-center">
                 <button
                   type="button"
-                  class="p-2"
-                  id={`btn-desplegable-${_id}`}>
+                  data-id={_id}
+                  class={`btn-delete-element-${_id} p-2`}>
+                  <img
+                    src="/xmark_black.svg"
+                    class="h-[25px] w-[25px]"
+                    alt="nube"
+                  />
+                </button>
+              </div>
+              <div class="hidden md:flex w-[50px] md:w-[10%] justify-center items-center">
+                <button
+                  type="button"
+                  class={`hideen md:flex btn-desplegable-${_id} p-2`}>
                   <img
                     src="/arrow_down.svg"
                     class="h-[25px] w-[25px]"
@@ -57,19 +75,21 @@ const respuesta = await ServersState();
                 </button>
               </div>
             </div>
+            <Funciones id={_id} />
             <div
               class="hidden w-full h-auto border-b border-black"
               id={`lista-de-tipos-${_id}`}>
               <ul class="w-full flex flex-col items-center justify-center">
                 <li class="w-full flex items-center justify-end">
                   <button
+                    data-id={_id}
                     type="button"
                     id="btn-form-branch-vista-open"
                     class="p-2">
                     <img
                       src="/plus.svg"
                       class="h-[25px] w-[25px]"
-                      alt="nube"
+                      alt="plus"
                     />
                   </button>
                 </li>
@@ -78,9 +98,9 @@ const respuesta = await ServersState();
                     return (
                       <li
                         id={m}
-                        class={`w-full flex items-center justify-between tipos-server-${_id}`}>
+                        class={`py-2 gap-x-2 w-full flex items-center justify-between tipos-server-${_id}`}>
                         <button
-                          class="p-2"
+                          class="flex items-center justify-center p-2"
                           id={`btn-back-up-${m}`}>
                           <img
                             src="/cloudDonwload.svg"
@@ -88,9 +108,9 @@ const respuesta = await ServersState();
                             alt="nube"
                           />
                         </button>
-                        <p class="h-full items-center justify-center">{m}</p>
+                        <p class="h-full w-full flex items-center">{m}</p>
                         <button
-                          id={`btn-remove-${m}`}
+                          id={`flex items-center justify-center n-remove-${m}`}
                           class="p-2">
                           <img
                             src="/xmark_black.svg"
@@ -109,57 +129,98 @@ const respuesta = await ServersState();
   }
 </ul>
 
-<script>import { removeBranch } from "../apis/firebase";
+<script>
+  import { removeBranch , deleteData } from "../apis/firebase.js";
 
   const btn_close = document.getElementById("btn-form-branch-vista-close");
-  const btn_open = document.getElementById("btn-form-branch-vista-open");
+  const btn_open = document.querySelectorAll("#btn-form-branch-vista-open");
   const form_add_branch = document.getElementById("form-add-branch");
 
   const lista_server = document.getElementById("lista_server");
-  const ids = [...lista_server.children].map((n) => n.id);
+  const ids = [...lista_server?.children].map((n) => n.id);
 
   let listas = [];
+  let remove_server = [];
+  let opciones = [];
+  let servers = [];
   let tipos = [];
   let btn_desplegable = [];
   let btn_remove = [];
 
   ids.map((n) => {
-    listas.push(document.getElementById("lista-de-tipos-" + n))  
-    const aux = document.querySelectorAll(".tipos-server-" + n)
-    
-    aux.forEach(m => {
-      tipos.push({elemet:m , id: n})
-    })
-
-    btn_desplegable.push(document.getElementById("btn-desplegable-" + n));
     btn_remove.push(document.getElementById("btn-remove-" + n));
+    listas.push(document.getElementById("lista-de-tipos-" + n));
+    opciones.push(document.getElementById("opciones-vista-" + n));
+    servers.push(document.getElementById("vista-server-" + n));
+    const aux = document.querySelectorAll(".tipos-server-" + n);
+    
+    aux.forEach((m) => {
+      tipos.push({ elemet: m, id: n });
+    });
+
+    remove_server = [
+      ...remove_server,
+      ...document.querySelectorAll(".btn-delete-element-" + n)
+    ]
+
+    btn_desplegable = [
+      ...btn_desplegable,
+      ...document.querySelectorAll(".btn-desplegable-" + n),
+    ]
+  });
+
+  servers.forEach((n, i) => {
+    n.addEventListener("click", () => {
+      const opcion: HTMLElement = opciones.find(
+        (m: HTMLElement) => m.dataset.id === n.dataset.id
+      );
+      if (opcion == null) return;
+      if (opcion.classList.contains("flex")) {
+        opcion.classList.remove("flex");
+        opcion.classList.add("hidden");
+      } else {
+        opcion.classList.remove("hidden");
+        opcion.classList.add("flex");
+      }
+    });
   });
 
   tipos.forEach((n, i) => {
     n.elemet.children[2].addEventListener("click", async (e) => {
-      await removeBranch(n.elemet , n.id)
-      //remove
+      await removeBranch(n.elemet.id, n.id);
+      window.location.reload();
     });
     n.elemet.children[0].addEventListener("click", (e) => {
       //nube
     });
   });
 
+  remove_server.forEach((n) => {
+    n.addEventListener("click", async () => {
+      if(n.dataset.id != null) await deleteData(n.dataset.id)
+      window.location.reload();
+    });
+  });
+
   btn_desplegable.forEach((n, i) => {
     n.addEventListener("click", () => {
-      if (listas[i].classList.contains("hidden")) {
-        listas[i].classList.remove("hidden");
-        listas[i].classList.add("flex");
-      } else if (listas[i].classList.contains("flex")) {
-        listas[i].classList.remove("flex");
-        listas[i].classList.add("hidden");
+      const indice = Math.trunc(i / 2)
+      if (listas[indice].classList.contains("hidden")) {
+        listas[indice].classList.remove("hidden");
+        listas[indice].classList.add("flex");
+      } else if (listas[indice].classList.contains("flex")) {
+        listas[indice].classList.remove("flex");
+        listas[indice].classList.add("hidden");
       }
     });
   });
 
-  btn_open.addEventListener("click", () => {
-    form_add_branch.classList.remove("hidden");
-    form_add_branch.classList.add("flex");
+  btn_open.forEach((n: HTMLElement) => {
+    n.addEventListener("click", () => {
+      form_add_branch.dataset.id_element = n?.dataset?.id;
+      form_add_branch.classList.remove("hidden");
+      form_add_branch.classList.add("flex");
+    });
   });
 
   btn_close.addEventListener("click", () => {

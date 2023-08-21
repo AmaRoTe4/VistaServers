@@ -1,5 +1,5 @@
 import db from "../db/firebase";
-import { collection, query, addDoc, getDocs, doc } from "firebase/firestore";
+import { collection, deleteDoc, updateDoc , addDoc, getDocs , getDoc, doc } from "firebase/firestore";
 import { newId } from "../funciones/id";
 
 export const getAllData = async () => {
@@ -29,23 +29,34 @@ export const createData = async (data) => {
   }
 };
 
-export const addBranch = async (name , conexion_tipos) => {
-  //try {
-  //  const docRef = await addDoc(collection(db, "sitios"), {...data , id: newId()});
-  //  console.log("creado con exito: ", docRef.id);
-  //} catch (e) {
-  //  console.error("Error adding document: ", e);
-  //}
+export const addBranch = async (name , userId) => {
+  if(name === "") return console.log("valor nulo");
+  try {
+    const userDocRef = doc(db, "sitios" , userId);
+    const data = await getDoc(userDocRef);
+    if(!data.exists()) return console.log("data no encontrada")
+    await updateDoc(userDocRef, {
+      tipos: [...data.data().tipos , name]
+    });
+    console.log("creado con exito");
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
 };
 
-export const removeBranch = async (name , conexion_tipos) => {
-    //try {
-    //  const docRef = await addDoc(collection(db, "sitios"), {...data , id: newId()});
-    //  console.log("creado con exito: ", docRef.id);
-    //} catch (e) {
-    //  console.error("Error adding document: ", e);
-    //}
-  };
+export const removeBranch = async (name , userId) => {
+    try {
+      const userDocRef = doc(db, "sitios" , userId);
+      const data = await getDoc(userDocRef);
+      if(!data.exists()) return console.log("data no encontrada")
+      await updateDoc(userDocRef, {
+        tipos: data.data().tipos.filter(n => n !== name)
+      });
+      console.log("removido con exito");
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+ };
 
 export const updateData = async (data) => {
   try {
@@ -56,6 +67,6 @@ export const updateData = async (data) => {
   }
 };
 
-export const deleteData = async (_id) => {
-  return await deleteDoc(doc(db, "sitios", _id));
+export const deleteData = async (id) => {
+  return await deleteDoc(doc(db, "sitios", id));
 };

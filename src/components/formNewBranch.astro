@@ -2,8 +2,8 @@
 const { parent } = Astro.props
 ---
 
-
 <div
+  data-id_element=""
   id="form-add-branch"
   class="hidden absolute top-0 left-0 h-screen w-screen flex-col items-center"
   style="background-color: rgba(0, 0, 0, .8);">
@@ -40,23 +40,20 @@ const { parent } = Astro.props
 </div>
 
 <script>
-  import { addBranch, createData } from "../apis/firebase.js";
+  import { addBranch } from "../apis/firebase.js";
 
+  const form_add_branch = document.getElementById("form-add-branch");
   const form = document.getElementById("form-new-rama") as HTMLFormElement;
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const formInfo = e.target as HTMLFormElement;
     const formData = new FormData(formInfo);
-
     const name = formData.get("name") as string;
 
-    const newConexion = {
-      name,
-    };
-
-    await addBranch(newConexion);
+    await addBranch(name , form_add_branch.dataset.id_element);
     form.reset()
     alert("Rama creada")
+    window.location.reload()
   });
 </script>
