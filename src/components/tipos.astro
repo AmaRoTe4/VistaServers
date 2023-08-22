@@ -1,0 +1,103 @@
+---
+const { _id, tipos } = Astro.props;
+---
+
+<div
+  class="hidden w-full h-auto border-b border-black"
+  id={`lista-de-tipos-${_id}`}
+  data-tipos={JSON.stringify(tipos)}>
+  <ul class="w-full flex flex-col items-center justify-center">
+    <li class="w-full flex items-center justify-end">
+      <button
+        data-id={_id}
+        type="button"
+        id="btn-form-branch-vista-open"
+        class="p-2">
+        <img
+          src="/plus.svg"
+          class="h-[25px] w-[25px]"
+          alt="plus"
+        />
+      </button>
+    </li>
+    {
+      tipos.length > 0 &&
+        tipos.map((m) => {
+          return (
+            <li
+              id={m}
+              class={`py-2 gap-x-2 w-full flex items-center justify-between tipos-server-${_id}`}>
+              <button
+                type="button"
+                class="flex items-center justify-center p-2"
+                id={`btn-back-up-${_id}-${m.name}`}>
+                <img
+                  src="/cloudDonwload.svg"
+                  class="h-[25px] w-[25px]"
+                  alt="nube"
+                />
+              </button>
+              <p class="h-full w-full flex items-center">{m.name}</p>
+              <button
+                id={`remove-branch-${_id}-${m.name}`}
+                class="flex items-center justify-center p-2"
+                type="button">
+                <img
+                  src="/xmark_black.svg"
+                  class="h-[25px] w-[25px] fill-black"
+                  alt="delete"
+                />
+              </button>
+            </li>
+          );
+        })
+    }
+  </ul>
+</div>
+
+<script>
+  import { removeBranch } from "../apis/firebase.js";
+
+  const btn_open = document.querySelectorAll("#btn-form-branch-vista-open");
+  const form_add_branch = document.getElementById("form-add-branch");
+
+  const lista_server = document.getElementById("lista_server");
+  const ids = [...lista_server?.children].map((n) => n.id);
+
+  let btn_remove_branch = [];
+  let btn_copia_branch = [];
+
+  ids.map((n) => {
+    const auxList = document.getElementById("lista-de-tipos-" + n);
+    const newTipos = JSON.parse(auxList.dataset.tipos);
+
+    newTipos.map((m) => {
+      btn_remove_branch.push({
+        tipo: m,
+        id: n,
+        element: document.getElementById("remove-branch-" + n + "-" + m.name),
+      });
+      btn_copia_branch.push({
+        tipo: m,
+        id: n,
+        element: document.getElementById("btn-back-up-" + n + "-" + m.name),
+      });
+    });
+  });
+
+  btn_remove_branch.forEach((n) => {
+    n.element.addEventListener("click", async () => {
+      await removeBranch(n.tipo.name, n.id);
+      alert("delete with good");
+      window.location.reload();
+    });
+  });
+
+  btn_open.forEach((n: HTMLElement) => {
+    n.addEventListener("click", () => {
+      form_add_branch.dataset.id_element = n?.dataset?.id;
+      form_add_branch.classList.remove("hidden");
+      form_add_branch.classList.add("flex");
+    });
+  });
+</script>

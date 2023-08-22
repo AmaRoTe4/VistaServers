@@ -50,7 +50,7 @@ export const removeBranch = async (name , userId) => {
       const data = await getDoc(userDocRef);
       if(!data.exists()) return console.log("data no encontrada")
       await updateDoc(userDocRef, {
-        tipos: data.data().tipos.filter(n => n !== name)
+        tipos: data.data().tipos.filter(n => n.name !== name)
       });
       console.log("removido con exito");
     } catch (e) {

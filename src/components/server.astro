@@ -2,6 +2,7 @@
 import ServersState from "../apis";
 import Funciones from "../components/funciones.astro";
 import FormNewBranch from "./formNewBranch.astro";
+import Tipos from "./tipos.astro";
 const respuesta = await ServersState();
 ---
 
@@ -76,53 +77,7 @@ const respuesta = await ServersState();
               </div>
             </div>
             <Funciones id={_id} />
-            <div
-              class="hidden w-full h-auto border-b border-black"
-              id={`lista-de-tipos-${_id}`}>
-              <ul class="w-full flex flex-col items-center justify-center">
-                <li class="w-full flex items-center justify-end">
-                  <button
-                    data-id={_id}
-                    type="button"
-                    id="btn-form-branch-vista-open"
-                    class="p-2">
-                    <img
-                      src="/plus.svg"
-                      class="h-[25px] w-[25px]"
-                      alt="plus"
-                    />
-                  </button>
-                </li>
-                {tipos.length > 0 &&
-                  tipos.map((m) => {
-                    return (
-                      <li
-                        id={m}
-                        class={`py-2 gap-x-2 w-full flex items-center justify-between tipos-server-${_id}`}>
-                        <button
-                          class="flex items-center justify-center p-2"
-                          id={`btn-back-up-${m}`}>
-                          <img
-                            src="/cloudDonwload.svg"
-                            class="h-[25px] w-[25px]"
-                            alt="nube"
-                          />
-                        </button>
-                        <p class="h-full w-full flex items-center">{m}</p>
-                        <button
-                          id={`flex items-center justify-center n-remove-${m}`}
-                          class="p-2">
-                          <img
-                            src="/xmark_black.svg"
-                            class="h-[25px] w-[25px] fill-black"
-                            alt="delete"
-                          />
-                        </button>
-                      </li>
-                    );
-                  })}
-              </ul>
-            </div>
+            <Tipos _id={_id} tipos={tipos} />
           </li>
         );
       })
@@ -130,12 +85,10 @@ const respuesta = await ServersState();
 </ul>
 
 <script>
-  import { removeBranch , deleteData } from "../apis/firebase.js";
+  import { deleteData } from "../apis/firebase.js";
 
   const btn_close = document.getElementById("btn-form-branch-vista-close");
-  const btn_open = document.querySelectorAll("#btn-form-branch-vista-open");
   const form_add_branch = document.getElementById("form-add-branch");
-
   const lista_server = document.getElementById("lista_server");
   const ids = [...lista_server?.children].map((n) => n.id);
 
@@ -143,20 +96,12 @@ const respuesta = await ServersState();
   let remove_server = [];
   let opciones = [];
   let servers = [];
-  let tipos = [];
   let btn_desplegable = [];
-  let btn_remove = [];
 
   ids.map((n) => {
-    btn_remove.push(document.getElementById("btn-remove-" + n));
     listas.push(document.getElementById("lista-de-tipos-" + n));
     opciones.push(document.getElementById("opciones-vista-" + n));
     servers.push(document.getElementById("vista-server-" + n));
-    const aux = document.querySelectorAll(".tipos-server-" + n);
-    
-    aux.forEach((m) => {
-      tipos.push({ elemet: m, id: n });
-    });
 
     remove_server = [
       ...remove_server,
@@ -185,21 +130,11 @@ const respuesta = await ServersState();
     });
   });
 
-  tipos.forEach((n, i) => {
-    n.elemet.children[2].addEventListener("click", async (e) => {
-      await removeBranch(n.elemet.id, n.id);
-      window.location.reload();
-    });
-    n.elemet.children[0].addEventListener("click", (e) => {
-      //nube
-    });
-  });
-
   remove_server.forEach((n) => {
-    n.addEventListener("click", async () => {
-      if(n.dataset.id != null) await deleteData(n.dataset.id)
-      window.location.reload();
-    });
+    //n.addEventListener("click", async () => {
+    //  if(n.dataset.id != null) await deleteData(n.dataset.id)
+    //  window.location.reload();
+    //});
   });
 
   btn_desplegable.forEach((n, i) => {
@@ -212,14 +147,6 @@ const respuesta = await ServersState();
         listas[indice].classList.remove("flex");
         listas[indice].classList.add("hidden");
       }
-    });
-  });
-
-  btn_open.forEach((n: HTMLElement) => {
-    n.addEventListener("click", () => {
-      form_add_branch.dataset.id_element = n?.dataset?.id;
-      form_add_branch.classList.remove("hidden");
-      form_add_branch.classList.add("flex");
     });
   });
 
