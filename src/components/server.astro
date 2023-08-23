@@ -7,8 +7,25 @@ const respuesta = await ServersState();
 ---
 
 <FormNewBranch />
+<main class="h-[80px] md:h-[120px] w-full flex flex-col justify-center items-center">
+  <p class="text-red-500 w-[95%] md:w-[75%] p-0 m-0">future implementation</p>
+  <div class="h-full flex items-center w-[95%] md:w-[75%]">
+    <button
+      id="general-back-up"
+      type="button"
+      class={`border border-black rounded-full p-2 flex items-center gap-2`}
+    >
+      <img
+        src="/cloud.svg"
+        class="h-[25px] w-[25px]"
+        alt="nube"
+      />
+      All Back Up
+    </button>
+  </div>
+</main>
 <ul
-  class="flex flex-col w-full items-center gap-2 py-10"
+  class="flex flex-col w-full items-center gap-2 pb-10"
   id="lista_server">
   {
     respuesta &&
@@ -20,6 +37,8 @@ const respuesta = await ServersState();
             <div class="w-full h-auto flex justify-between gap-5 md:gap-0">
               <div class="hidden w-[50px] md:w-[10%] md:flex justify-center items-center">
                 <button
+                  data-id={_id}
+                  type="button"
                   class={`${
                     "cloud-memori-" + _id
                   } border border-black rounded-full p-2`}>
@@ -35,9 +54,7 @@ const respuesta = await ServersState();
                 id={`vista-server-${_id}`}
                 class="flex justify-center items-center w-full min-w-[225px] md:w-[70%] border border-black rounded-md">
                 <div class="w-full md:w-[80%] flex px-3 py-2">
-                  <h3>
-                    {titulo}
-                  </h3>
+                  <h3>{titulo}</h3>
                 </div>
                 <div class="w-[70px] md:w-[20%] flex justify-end items-center px-3 py-2">
                   <a
@@ -77,7 +94,10 @@ const respuesta = await ServersState();
               </div>
             </div>
             <Funciones id={_id} />
-            <Tipos _id={_id} tipos={tipos} />
+            <Tipos
+              _id={_id}
+              tipos={tipos}
+            />
           </li>
         );
       })
@@ -86,6 +106,7 @@ const respuesta = await ServersState();
 
 <script>
   import { deleteData } from "../apis/firebase.js";
+  import { crearNewFiles } from "../apis/github.js";
 
   const btn_close = document.getElementById("btn-form-branch-vista-close");
   const form_add_branch = document.getElementById("form-add-branch");
@@ -97,21 +118,27 @@ const respuesta = await ServersState();
   let opciones = [];
   let servers = [];
   let btn_desplegable = [];
+  let btn_cloud = [];
 
   ids.map((n) => {
     listas.push(document.getElementById("lista-de-tipos-" + n));
     opciones.push(document.getElementById("opciones-vista-" + n));
     servers.push(document.getElementById("vista-server-" + n));
 
+    btn_cloud = [
+      ...btn_cloud,
+      ...document.querySelectorAll(".cloud-memori-" + n),
+    ];
+
     remove_server = [
       ...remove_server,
-      ...document.querySelectorAll(".btn-delete-element-" + n)
-    ]
+      ...document.querySelectorAll(".btn-delete-element-" + n),
+    ];
 
     btn_desplegable = [
       ...btn_desplegable,
       ...document.querySelectorAll(".btn-desplegable-" + n),
-    ]
+    ];
   });
 
   servers.forEach((n, i) => {
@@ -130,6 +157,16 @@ const respuesta = await ServersState();
     });
   });
 
+  btn_cloud.forEach((n) => {
+    n.addEventListener("click", async () => {
+      if (n.dataset.id != null) {
+        await crearNewFiles(n.dataset.id);
+        alert("Creado con exito")
+      }
+      window.location.reload();
+    });
+  });
+
   remove_server.forEach((n) => {
     //n.addEventListener("click", async () => {
     //  if(n.dataset.id != null) await deleteData(n.dataset.id)
@@ -139,7 +176,7 @@ const respuesta = await ServersState();
 
   btn_desplegable.forEach((n, i) => {
     n.addEventListener("click", () => {
-      const indice = Math.trunc(i / 2)
+      const indice = Math.trunc(i / 2);
       if (listas[indice].classList.contains("hidden")) {
         listas[indice].classList.remove("hidden");
         listas[indice].classList.add("flex");

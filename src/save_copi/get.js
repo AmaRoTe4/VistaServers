@@ -1,4 +1,4 @@
-import { REPOOWNER, REPONAME , ACCESS_TOKEN } from "../const.ts";
+import { REPOOWNER, REPONAME , USERMANE , ACCESS_TOKEN } from "../const.ts";
 
 export const getDataForContent = async (repo = "") => {
   const url = `https://api.github.com/repos/${REPOOWNER}/${REPONAME}/contents${repo !== "" ? "/" + repo : ""}`;
@@ -7,22 +7,16 @@ export const getDataForContent = async (repo = "") => {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Basic ${btoa(`${username}:${ACCESS_TOKEN}`)}`,
+      Authorization: `Basic ${btoa(`${USERMANE}:${ACCESS_TOKEN}`)}`,
     }
   };
 
-  await fetch(url , options)
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw new Error("Error al crear el archivo");
-      }
-    })
+  return await fetch(url , options)
+    .then((response) => response.json())
     .then((data) => {
-      console.log("Archivo creado exitosamente:", data.content.html_url);
+      return data
     })
     .catch((error) => {
-      console.error("Error al crear el archivo:", error.message);
+      console.error("Vistal feil", error.message);
     });
 };

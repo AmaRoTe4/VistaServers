@@ -85,6 +85,12 @@ const { _id, tipos } = Astro.props;
     });
   });
 
+  btn_copia_branch.forEach((n) => {
+    n.element.addEventListener("click", async () => {
+      //await crearNewFile(n.tipo.name, n.id)
+    });
+  });
+
   btn_remove_branch.forEach((n) => {
     n.element.addEventListener("click", async () => {
       await removeBranch(n.tipo.name, n.id);

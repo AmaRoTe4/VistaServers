@@ -17,6 +17,18 @@ export const getAllData = async () => {
   }
 };
 
+export const getData = async (userId) => {
+  try {
+    const userDocRef = doc(db, "sitios" , userId);
+    const data = await getDoc(userDocRef);
+    if(!data.exists()) return console.log("data no encontrada")
+    return data.data()
+  } catch (error) {
+    console.log(error);
+    return undefined;
+  }
+};
+
 export const createData = async (data) => {
   try {
     const docRef = await addDoc(collection(db, "sitios"), {
