@@ -49,6 +49,7 @@
 
 <script>
   import { createData } from "../apis/firebase.js";
+import { CartelSuccess } from "./carteles/funciones";
 
   const form = document.getElementById("form-new-conexion") as HTMLFormElement;
 
@@ -73,6 +74,6 @@
 
     await createData(newConexion);
     form.reset()
-    alert("Creado")
+    CartelSuccess("Creado!!!")
   });
 </script>

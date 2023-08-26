@@ -1,5 +1,5 @@
 ---
-const { parent } = Astro.props
+const { parent } = Astro.props;
 ---
 
 <div
@@ -37,7 +37,11 @@ const { parent } = Astro.props
         id="path"
         name="path"
       />
-      <label for="clave" class="text-red-500">implementado</label>
+      <label
+        for="clave"
+        class="text-red-500"
+        >implementado</label
+      >
       <input
         class="px-3 py-2 text-black text-[20px]"
         type="text"
@@ -56,6 +60,7 @@ const { parent } = Astro.props
 
 <script>
   import { addBranch } from "../apis/firebase.js";
+  import { CartelSuccess } from "./carteles/funciones";
 
   const form_add_branch = document.getElementById("form-add-branch");
   const form = document.getElementById("form-new-rama") as HTMLFormElement;
@@ -66,10 +71,11 @@ const { parent } = Astro.props
     const formData = new FormData(formInfo);
     const name = formData.get("name") as string;
     const path = formData.get("path") as string;
+    const clave = formData.get("clave") as string;
 
-    await addBranch({name , path} , form_add_branch.dataset.id_element);
-    form.reset()
-    alert("Rama creada")
-    window.location.reload()
+    await addBranch({ name, path, clave }, form_add_branch.dataset.id_element);
+    form.reset();
+    CartelSuccess("Rama creada");
+    window.location.reload();
   });
 </script>

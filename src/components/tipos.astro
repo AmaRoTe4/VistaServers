@@ -3,11 +3,11 @@ const { _id, tipos } = Astro.props;
 ---
 
 <div
-  class="hidden w-full h-auto border-b border-black"
+  class="hidden w-full h-auto pb-10"
   id={`lista-de-tipos-${_id}`}
   data-tipos={JSON.stringify(tipos)}>
-  <ul class="w-full flex flex-col items-center justify-center">
-    <li class="w-full flex items-center justify-end">
+  <ul class="w-full flex flex-col gap-2 items-center justify-center">
+    <li class="w-full flex items-center justify-end p-1">
       <button
         data-id={_id}
         type="button"
@@ -26,25 +26,15 @@ const { _id, tipos } = Astro.props;
           return (
             <li
               id={m}
-              class={`py-2 gap-x-2 w-full flex items-center justify-between tipos-server-${_id}`}>
-              <button
-                type="button"
-                class="flex items-center justify-center p-2"
-                id={`btn-back-up-${_id}-${m.name}`}>
-                <img
-                  src="/cloudDonwload.svg"
-                  class="h-[25px] w-[25px]"
-                  alt="nube"
-                />
-              </button>
-              <p class="h-full w-full flex items-center">{m.name}</p>
+              class={`p-1 gap-x-2 w-full flex items-center justify-between tipos-server-${_id} border border-gray-500 bg-gray-300`}>
+              <p class="ps-2 h-full w-full flex items-center text-[16px]">{m.name}</p>
               <button
                 id={`remove-branch-${_id}-${m.name}`}
                 class="flex items-center justify-center p-2"
                 type="button">
                 <img
                   src="/xmark_black.svg"
-                  class="h-[25px] w-[25px] fill-black"
+                  class="h-[25px] w-[25px] md:h-[16px] md:w-[16px] fill-black"
                   alt="delete"
                 />
               </button>
@@ -57,6 +47,7 @@ const { _id, tipos } = Astro.props;
 
 <script>
   import { removeBranch } from "../apis/firebase.js";
+import { CartelSuccess } from "./carteles/funciones";
 
   const btn_open = document.querySelectorAll("#btn-form-branch-vista-open");
   const form_add_branch = document.getElementById("form-add-branch");
@@ -65,7 +56,6 @@ const { _id, tipos } = Astro.props;
   const ids = [...lista_server?.children].map((n) => n.id);
 
   let btn_remove_branch = [];
-  let btn_copia_branch = [];
 
   ids.map((n) => {
     const auxList = document.getElementById("lista-de-tipos-" + n);
@@ -77,24 +67,13 @@ const { _id, tipos } = Astro.props;
         id: n,
         element: document.getElementById("remove-branch-" + n + "-" + m.name),
       });
-      btn_copia_branch.push({
-        tipo: m,
-        id: n,
-        element: document.getElementById("btn-back-up-" + n + "-" + m.name),
-      });
-    });
-  });
-
-  btn_copia_branch.forEach((n) => {
-    n.element.addEventListener("click", async () => {
-      //await crearNewFile(n.tipo.name, n.id)
     });
   });
 
   btn_remove_branch.forEach((n) => {
     n.element.addEventListener("click", async () => {
       await removeBranch(n.tipo.name, n.id);
-      alert("delete with good");
+      CartelSuccess("delete with good");
       window.location.reload();
     });
   });
