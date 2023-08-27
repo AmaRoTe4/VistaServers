@@ -20,9 +20,10 @@ export default async function ServersState() {
       id: data[i].id,
       titulo: data[i].titulo,
       url: data[i].url,
-      estado: respuesta,
+      estado: true,
       tipos: data[i].tipos,
     });
   }
+
   return retorno;
 }

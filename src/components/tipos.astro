@@ -47,7 +47,7 @@ const { _id, tipos } = Astro.props;
 
 <script>
   import { removeBranch } from "../apis/firebase.js";
-import { CartelSuccess } from "./carteles/funciones";
+import { CartelSuccess } from "./carteles/funciones.js";
 
   const btn_open = document.querySelectorAll("#btn-form-branch-vista-open");
   const form_add_branch = document.getElementById("form-add-branch");
@@ -74,7 +74,6 @@ import { CartelSuccess } from "./carteles/funciones";
     n.element.addEventListener("click", async () => {
       await removeBranch(n.tipo.name, n.id);
       CartelSuccess("delete with good");
-      window.location.reload();
     });
   });
 

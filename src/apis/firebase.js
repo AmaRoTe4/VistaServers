@@ -1,6 +1,14 @@
-import db from "../db/firebase";
-import { collection, deleteDoc, updateDoc , addDoc, getDocs , getDoc, doc } from "firebase/firestore";
-import { newId } from "../funciones/id";
+import db from "../db/firebase.js";
+import {
+  collection,
+  deleteDoc,
+  updateDoc,
+  addDoc,
+  getDocs,
+  getDoc,
+  doc,
+} from "firebase/firestore";
+import { newId } from "../funciones/id.js";
 
 export const getAllData = async () => {
   try {
@@ -19,10 +27,10 @@ export const getAllData = async () => {
 
 export const getData = async (userId) => {
   try {
-    const userDocRef = doc(db, "sitios" , userId);
+    const userDocRef = doc(db, "sitios", userId);
     const data = await getDoc(userDocRef);
-    if(!data.exists()) return console.log("data no encontrada")
-    return data.data()
+    if (!data.exists()) return console.log("data no encontrada");
+    return data.data();
   } catch (error) {
     console.log(error);
     return undefined;
@@ -41,14 +49,14 @@ export const createData = async (data) => {
   }
 };
 
-export const addBranch = async (name , userId) => {
-  if(name === "") return console.log("valor nulo");
+export const addBranch = async (name, userId) => {
+  if (name === "") return console.log("valor nulo");
   try {
-    const userDocRef = doc(db, "sitios" , userId);
+    const userDocRef = doc(db, "sitios", userId);
     const data = await getDoc(userDocRef);
-    if(!data.exists()) return console.log("data no encontrada")
+    if (!data.exists()) return console.log("data no encontrada");
     await updateDoc(userDocRef, {
-      tipos: [...data.data().tipos , name]
+      tipos: [...data.data().tipos, name],
     });
     console.log("creado con exito");
   } catch (e) {
@@ -56,19 +64,19 @@ export const addBranch = async (name , userId) => {
   }
 };
 
-export const removeBranch = async (name , userId) => {
-    try {
-      const userDocRef = doc(db, "sitios" , userId);
-      const data = await getDoc(userDocRef);
-      if(!data.exists()) return console.log("data no encontrada")
-      await updateDoc(userDocRef, {
-        tipos: data.data().tipos.filter(n => n.name !== name)
-      });
-      console.log("removido con exito");
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
- };
+export const removeBranch = async (name, userId) => {
+  try {
+    const userDocRef = doc(db, "sitios", userId);
+    const data = await getDoc(userDocRef);
+    if (!data.exists()) return console.log("data no encontrada");
+    await updateDoc(userDocRef, {
+      tipos: data.data().tipos.filter((n) => n.name !== name),
+    });
+    console.log("removido con exito");
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+};
 
 export const updateData = async (data) => {
   try {

@@ -32,12 +32,6 @@
         id="url"
         name="url"
       />
-      <textarea
-        id="tipos"
-        name="tipos"
-        class="px-3 py-2 text-black text-[20px]"
-        placeholder="tipos"
-      ></textarea>
       <button
         type="submit"
         class="bg-green-500 px-2 py-3 text-black min-w-[80%]">
@@ -49,7 +43,7 @@
 
 <script>
   import { createData } from "../apis/firebase.js";
-import { CartelSuccess } from "./carteles/funciones";
+import { CartelSuccess } from "./carteles/funciones.js";
 
   const form = document.getElementById("form-new-conexion") as HTMLFormElement;
 
@@ -61,14 +55,11 @@ import { CartelSuccess } from "./carteles/funciones";
     const titulo = formData.get("titulo") as string;
     const url = formData.get("url") as string;
     let tipos_string = formData.get("tipos") as string;
-    const tipos = tipos_string
-      .split("\n")
-      .map((n) => n.trim().toLocaleLowerCase());
 
     const newConexion = {
       titulo,
       url,
-      tipos,
+      tipos: [],
       estado: false,
     };
 

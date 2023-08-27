@@ -1,0 +1,146 @@
+---
+import ServersState from "../apis/index.js";
+import Funciones from "../components/funciones.astro";
+import Tipos from "./tipos.astro";
+const respuesta = await ServersState();
+---
+
+<ul
+  class="flex flex-col w-full items-center gap-2 py-10 md:py-0 md:pb-10"
+  id="lista_server">
+  {
+    respuesta &&
+      respuesta.map(({ _id, url, titulo, estado, tipos }) => {
+        return (
+          <li
+            id={_id}
+            class="w-[95%] md:w-[80%] flex flex-col items-center gap-5 md:gap-2 rounded-md">
+            <div class="w-full h-auto flex justify-between gap-5 md:gap-0">
+              <span
+                data-id={_id}
+                id={`vista-server-${_id}`}
+                class="flex justify-center items-center w-full min-w-[225px] md:w-[86%] border border-black rounded-md">
+                <div class="w-full md:w-[80%] flex px-3 py-2">
+                  <h3>{titulo}</h3>
+                </div>
+                <div class="w-[70px] md:w-[20%] flex justify-end items-center px-3 py-2">
+                  <a
+                    href={url}
+                    title={titulo}
+                    target="_blank"
+                    class={`
+                      border border-black
+                    ${
+                      estado ? "bg-green-600" : "bg-red-600"
+                    } h-[40px] w-[40px] rounded-full
+                    `}
+                  />
+                </div>
+              </span>
+              <div class="hidden w-[50px] md:w-[7%] md:flex justify-center items-center">
+                <button
+                  type="button"
+                  data-id={_id}
+                  class={`btn-delete-element-${_id} p-2`}>
+                  <img
+                    src="/xmark_black.svg"
+                    class="h-[25px] w-[25px]"
+                    alt="nube"
+                  />
+                </button>
+              </div>
+              <div class="hidden md:flex w-[50px] md:w-[7%] justify-center items-center">
+                <button
+                  type="button"
+                  class={`hideen md:flex btn-desplegable-${_id} p-2`}>
+                  <img
+                    src="/arrow_down.svg"
+                    class="h-[25px] w-[25px]"
+                    alt="nube"
+                  />
+                </button>
+              </div>
+            </div>
+            <Funciones id={_id} />
+            <Tipos
+              _id={_id}
+              tipos={tipos}
+            />
+          </li>
+        );
+      })
+  }
+</ul>
+
+<script>
+  import { deleteData } from "../apis/firebase.js";
+  import { CartelSuccess } from "./carteles/funciones.js";
+
+  const btn_close = document.getElementById("btn-form-branch-vista-close");
+  const form_add_branch = document.getElementById("form-add-branch");
+  const lista_server = document.getElementById("lista_server");
+  const ids = [...lista_server?.children].map((n) => n.id);
+
+  let listas = [];
+  let remove_server = [];
+  let opciones = [];
+  let servers = [];
+  let btn_desplegable = [];
+
+  ids.map((n) => {
+    listas.push(document.getElementById("lista-de-tipos-" + n));
+    opciones.push(document.getElementById("opciones-vista-" + n));
+    servers.push(document.getElementById("vista-server-" + n));
+
+    remove_server = [
+      ...remove_server,
+      ...document.querySelectorAll(".btn-delete-element-" + n),
+    ];
+
+    btn_desplegable = [
+      ...btn_desplegable,
+      ...document.querySelectorAll(".btn-desplegable-" + n),
+    ];
+  });
+
+  servers.forEach((n, i) => {
+    n.addEventListener("click", () => {
+      const opcion: HTMLElement = opciones.find(
+        (m: HTMLElement) => m.dataset.id === n.dataset.id
+      );
+      if (opcion == null) return;
+      if (opcion.classList.contains("flex")) {
+        opcion.classList.remove("flex");
+        opcion.classList.add("hidden");
+      } else {
+        opcion.classList.remove("hidden");
+        opcion.classList.add("flex");
+      }
+    });
+  });
+
+  remove_server.forEach((n) => {
+    n.addEventListener("click", async () => {
+      if (n.dataset.id != null) await deleteData(n.dataset.id);
+      CartelSuccess("Eliminado con exito!!!");
+    });
+  });
+
+  btn_desplegable.forEach((n, i) => {
+    n.addEventListener("click", () => {
+      const indice = Math.trunc(i / 2);
+      if (listas[indice].classList.contains("hidden")) {
+        listas[indice].classList.remove("hidden");
+        listas[indice].classList.add("flex");
+      } else if (listas[indice].classList.contains("flex")) {
+        listas[indice].classList.remove("flex");
+        listas[indice].classList.add("hidden");
+      }
+    });
+  });
+
+  btn_close.addEventListener("click", () => {
+    form_add_branch.classList.remove("flex");
+    form_add_branch.classList.add("hidden");
+  });
+</script>
