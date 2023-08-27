@@ -1,5 +1,5 @@
 ---
-import Respuesta from "./respuestas.astro"
+import Respuestas from "./respuestas.jsx";
 import FormNewBranch from "./formNewBranch.astro";
 ---
 
@@ -21,4 +21,111 @@ import FormNewBranch from "./formNewBranch.astro";
     </div>
   </div>
 </main>
-<Respuesta client:load />
+<Respuestas client:load />
+
+<script>
+  import { deleteData } from "../apis/firebase.js";
+  import { CartelSuccess } from "./carteles/funciones.js";
+
+  const btn_close = document.getElementById("btn-form-branch-vista-close");
+  const form_add_branch = document.getElementById("form-add-branch");
+  const lista_server = document.getElementById("lista_server");
+  const ids = [...lista_server?.children].map((n) => n.id);
+
+  let listas = [];
+  let remove_server = [];
+  let opciones = [];
+  let servers = [];
+  let btn_desplegable = [];
+
+  ids.map((n) => {
+    listas.push(document.getElementById("lista-de-tipos-" + n));
+    opciones.push(document.getElementById("opciones-vista-" + n));
+    servers.push(document.getElementById("vista-server-" + n));
+
+    remove_server = [
+      ...remove_server,
+      ...document.querySelectorAll(".btn-delete-element-" + n),
+    ];
+
+    btn_desplegable = [
+      ...btn_desplegable,
+      ...document.querySelectorAll(".btn-desplegable-" + n),
+    ];
+  });
+
+  servers.forEach((n, i) => {
+    n.addEventListener("click", () => {
+      const opcion: HTMLElement = opciones.find(
+        (m: HTMLElement) => m.dataset.id === n.dataset.id
+      );
+      if (opcion == null) return;
+      if (opcion.classList.contains("flex")) {
+        opcion.classList.remove("flex");
+        opcion.classList.add("hidden");
+      } else {
+        opcion.classList.remove("hidden");
+        opcion.classList.add("flex");
+      }
+    });
+  });
+
+  remove_server.forEach((n) => {
+    n.addEventListener("click", async () => {
+      if (n.dataset.id != null) await deleteData(n.dataset.id);
+      CartelSuccess("Eliminado con exito!!!");
+    });
+  });
+
+  btn_desplegable.forEach((n, i) => {
+    n.addEventListener("click", () => {
+      const indice = Math.trunc(i / 2);
+      if (listas[indice].classList.contains("hidden")) {
+        listas[indice].classList.remove("hidden");
+        listas[indice].classList.add("flex");
+      } else if (listas[indice].classList.contains("flex")) {
+        listas[indice].classList.remove("flex");
+        listas[indice].classList.add("hidden");
+      }
+    });
+  });
+
+  btn_close.addEventListener("click", () => {
+    form_add_branch.classList.remove("flex");
+    form_add_branch.classList.add("hidden");
+  });
+
+  //tipos
+  import { removeBranch } from "../apis/firebase.js";
+
+  const btn_open = document.querySelectorAll("#btn-form-branch-vista-open");
+  let btn_remove_branch = [];
+
+  ids.map((n) => {
+    const auxList = document.getElementById("lista-de-tipos-" + n);
+    const newTipos = JSON.parse(auxList.dataset.tipos);
+
+    newTipos.map((m) => {
+      btn_remove_branch.push({
+        tipo: m,
+        id: n,
+        element: document.getElementById("remove-branch-" + n + "-" + m.name),
+      });
+    });
+  });
+
+  btn_remove_branch.forEach((n) => {
+    n.element.addEventListener("click", async () => {
+      await removeBranch(n.tipo.name, n.id);
+      CartelSuccess("delete with good");
+    });
+  });
+
+  btn_open.forEach((n: HTMLElement) => {
+    n.addEventListener("click", () => {
+      form_add_branch.dataset.id_element = n?.dataset?.id;
+      form_add_branch.classList.remove("hidden");
+      form_add_branch.classList.add("flex");
+    });
+  });
+</script>
